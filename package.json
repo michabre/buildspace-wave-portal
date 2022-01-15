@@ -6,7 +6,8 @@
   "scripts": {
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "npx hardhat run scripts/deploy.js --network localhost"
+    "localhost": "npx hardhat run scripts/deploy.js --network localhost",
+    "rinkeby": "npx hardhat run scripts/deploy.js --network rinkeby"
   },
   "keywords": [],
   "author": "",
