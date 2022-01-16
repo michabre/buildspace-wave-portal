@@ -8,7 +8,8 @@ import {
   Flex, 
   VStack, 
   Heading, 
-  Text } from '@chakra-ui/react'
+  Text, 
+  Tag } from '@chakra-ui/react'
 import { ethers } from "ethers"
 import theme from './theme'
 import Header from "./components/layout/Header"
@@ -20,19 +21,11 @@ import abi from "./utils/WavePortal.json"
 
 export default function App() {
   const { colorMode, toggleColorMode } = useColorMode()
-  /*
-  * Just a state variable we use to store our user's public wallet.
-  */
   const [currentAccount, setCurrentAccount] = useState("")
+  const [waveCount, setWaveCount] = useState(0)
+  const [status, setStatus] = useState("No active transaction")
 
-  /**
-   * Create a variable here that holds the contract address after you deploy!
-   */
-   const contractAddress = "0xe4A174Bc043A7E7438b0f391eb07532CA11e80F7"
-
-   /**
-   * Create a variable here that references the abi content!
-   */
+  const contractAddress = "0xe4A174Bc043A7E7438b0f391eb07532CA11e80F7"
   const contractABI = abi.abi
 
   const checkIfWalletIsConnected = async () => {
@@ -44,6 +37,14 @@ export default function App() {
         return;
       } else {
         console.log("We have the ethereum object", ethereum);
+        
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        let count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total wave count...", count.toNumber());
+        setWaveCount(count.toNumber());
       }
 
       /*
@@ -99,21 +100,26 @@ export default function App() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
+        
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        setWaveCount(count.toNumber());
 
         /*
         * Execute the actual wave from your smart contract
         */
         const waveTxn = await wavePortalContract.wave();
         console.log("Mining...", waveTxn.hash);
+        setStatus('Mining in Progress...')
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
+        setStatus('Mined')
 
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        setWaveCount(count.toNumber());
+        setStatus('Completed')
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -125,7 +131,7 @@ export default function App() {
   return (
     <>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-      <Header mode={toggleColorMode} current={colorMode} />
+      <Header mode={toggleColorMode} current={colorMode} account={currentAccount} connect={connectWallet} />
       <Container maxW='container.md' h='60vh'>
         <Flex h='100%' align='center'>
           <Box>
@@ -143,20 +149,11 @@ export default function App() {
                 Wave at Me
               </Button>
 
-              {/*
-        * If there is no currentAccount render this button
-        */}
-        {!currentAccount && (
-          <Button onClick={connectWallet}>
-            Connect Wallet
-          </Button>
-        )}
-
             </VStack>
           </Box>
         </Flex>
       </Container>
-      <Footer />
+      <Footer status={status} waves={waveCount} />
     </>
   )
 }
