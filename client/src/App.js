@@ -8,8 +8,7 @@ import {
   Flex, 
   VStack, 
   Heading, 
-  Text, 
-  Tag } from '@chakra-ui/react'
+  Text } from '@chakra-ui/react'
 import { ethers } from "ethers"
 import theme from './theme'
 import Header from "./components/layout/Header"
@@ -24,8 +23,13 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState("")
   const [waveCount, setWaveCount] = useState(0)
   const [status, setStatus] = useState("No active transaction")
+ 
+  /*
+   * All state property to store all waves
+   */
+  const [allWaves, setAllWaves] = useState([]);
 
-  const contractAddress = "0xe4A174Bc043A7E7438b0f391eb07532CA11e80F7"
+  const contractAddress = "0x108cdab92fB27BF32338C4A0864FBEBb6799D666"
   const contractABI = abi.abi
 
   const checkIfWalletIsConnected = async () => {
@@ -90,6 +94,7 @@ export default function App() {
   */
   useEffect(() => {
     checkIfWalletIsConnected();
+    getAllWaves();
   }, [])
 
   const wave = async () => {
@@ -108,7 +113,7 @@ export default function App() {
         /*
         * Execute the actual wave from your smart contract
         */
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave('Testing');
         console.log("Mining...", waveTxn.hash);
         setStatus('Mining in Progress...')
 
@@ -125,6 +130,48 @@ export default function App() {
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
   
@@ -152,6 +199,22 @@ export default function App() {
             </VStack>
           </Box>
         </Flex>
+      </Container>
+      <Container maxW='container.md' align='center'>
+
+            <VStack h='100%'>
+              {allWaves.map((wave, index) => {
+                return (
+                  <Box key={index}>
+                    <Text fontSize='lg' align='center'>
+                      <div>Address: {wave.address}</div>
+                      <div>Time: {wave.timestamp.toString()}</div>
+                      <div>Message: {wave.message}</div>
+                    </Text>
+                  </Box>)
+              })}
+            </VStack>
+
       </Container>
       <Footer status={status} waves={waveCount} />
     </>

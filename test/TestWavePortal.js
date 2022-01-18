@@ -19,7 +19,7 @@ describe("WavePortal", function () {
       let waveCount = await contract.getTotalWaves();
       assert.equal(waveCount, 0);
 
-      let waveTxn = await contract.wave();
+      let waveTxn = await contract.wave('Hello');
       await waveTxn.wait();
 
       waveCount = await contract.getTotalWaves();

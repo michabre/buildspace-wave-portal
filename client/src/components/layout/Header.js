@@ -5,8 +5,7 @@ import {
   Box,
   Flex,
   Heading,
-  Spacer,
-  Menu
+  Spacer
 } from '@chakra-ui/react'
 
 import { MoonIcon, SunIcon, StarIcon} from '@chakra-ui/icons'
