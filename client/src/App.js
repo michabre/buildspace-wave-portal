@@ -8,7 +8,10 @@ import {
   Flex, 
   VStack, 
   Heading, 
-  Text } from '@chakra-ui/react'
+  UnorderedList,
+  ListItem,
+  Text,
+  Textarea } from '@chakra-ui/react'
 import { ethers } from "ethers"
 import theme from './theme'
 import Header from "./components/layout/Header"
@@ -23,14 +26,27 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState("")
   const [waveCount, setWaveCount] = useState(0)
   const [status, setStatus] = useState("No active transaction")
+  const [message, setMessage] = useState("")
  
   /*
    * All state property to store all waves
    */
   const [allWaves, setAllWaves] = useState([]);
 
-  const contractAddress = "0x108cdab92fB27BF32338C4A0864FBEBb6799D666"
+  const contractAddress = "0xF608ee3288c97b4c57ca870eD12E836c945D91FB"
   const contractABI = abi.abi
+
+    /*
+  * This runs our function when the page loads.
+  */
+    useEffect(() => {
+      checkIfWalletIsConnected();
+      getAllWaves();
+    }, [])
+
+    useEffect(() => {
+      console.log('runs after every component update', waveCount)
+    }, [waveCount])
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -89,13 +105,7 @@ export default function App() {
     }
   }
 
-  /*
-  * This runs our function when the page loads.
-  */
-  useEffect(() => {
-    checkIfWalletIsConnected();
-    getAllWaves();
-  }, [])
+
 
   const wave = async () => {
     try {
@@ -113,7 +123,7 @@ export default function App() {
         /*
         * Execute the actual wave from your smart contract
         */
-        const waveTxn = await wavePortalContract.wave('Testing');
+        const waveTxn = await wavePortalContract.wave(message);
         console.log("Mining...", waveTxn.hash);
         setStatus('Mining in Progress...')
 
@@ -174,22 +184,37 @@ export default function App() {
       console.log(error);
     }
   }
+
+  const updateMessage = (event) => {
+    let text = event.target.value
+    setMessage(text)
+  }
   
   return (
     <>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <Header mode={toggleColorMode} current={colorMode} account={currentAccount} connect={connectWallet} />
-      <Container maxW='container.md' h='60vh'>
+      <Container maxW='container.md'>
         <Flex h='100%' align='center'>
           <Box>
             <VStack h='100%'>
           
-              <Heading as='h2'>👋 Hey there!</Heading>
+              <Heading as='h2'>Hey there!</Heading>
 
               <Box padding='4'>
                 <Text fontSize='lg' align='center'>
                   My name is Michael and this my first Buildspace project. Connect your Ethereum wallet and wave at me!
                 </Text>
+              </Box>
+
+              <Box padding='4'>
+              <Text mb='8px'>Add a message</Text>
+              <Textarea
+                value={message}
+                onChange={updateMessage}
+                placeholder='Here is a sample placeholder'
+                size='lg'
+              />
               </Box>
 
               <Button onClick={wave}>
@@ -201,20 +226,19 @@ export default function App() {
         </Flex>
       </Container>
       <Container maxW='container.md' align='center'>
-
-            <VStack h='100%'>
-              {allWaves.map((wave, index) => {
-                return (
-                  <Box key={index}>
-                    <Text fontSize='lg' align='center'>
-                      <div>Address: {wave.address}</div>
-                      <div>Time: {wave.timestamp.toString()}</div>
-                      <div>Message: {wave.message}</div>
-                    </Text>
-                  </Box>)
-              })}
-            </VStack>
-
+        <VStack h='100%'>
+          <Heading as='h3' size='lg'>Waves</Heading>
+          {allWaves.map((wave, index) => {
+            return (
+              <Box borderWidth='1px' borderRadius='lg' overflow='hidden' key={index} p='5' spacing='3'>
+                <UnorderedList m='0' listStyleType='none'>
+                  <ListItem>Address: {wave.address}</ListItem>
+                  <ListItem>Time: {wave.timestamp.toString()}</ListItem>
+                  <ListItem>Message: {wave.message}</ListItem>
+                </UnorderedList>
+              </Box>)
+          })}
+        </VStack>
       </Container>
       <Footer status={status} waves={waveCount} />
     </>
