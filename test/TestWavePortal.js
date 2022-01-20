@@ -5,7 +5,9 @@ describe("WavePortal", function () {
 
   beforeEach(async () => {
     const WavePortal = await ethers.getContractFactory("WavePortal");
-    contract = await WavePortal.deploy();
+    contract = await WavePortal.deploy({
+      value: hre.ethers.utils.parseEther("0.1"),
+    });
   });
 
   describe("Test WavePortal Contract", () => {
