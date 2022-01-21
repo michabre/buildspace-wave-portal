@@ -19,12 +19,15 @@ const Header = ({ mode, current, account, connect }) => {
         </Box>
         <Spacer />
         <Box p='4'>
+          Connected Account: {account}
+        </Box>
+        <Box p='4'>
         <ButtonGroup variant='outline' spacing='2'>
           {!account && (
-          <Button leftIcon={<StarIcon />} onClick={connect}>
-            Connect
-          </Button>
-        )}
+            <Button leftIcon={<StarIcon />} onClick={connect}>
+              Connect
+            </Button>
+          )}
             <Button leftIcon={icon} onClick={mode}>
             I prefer the&nbsp;<strong>{current}</strong>
             </Button>

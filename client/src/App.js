@@ -8,15 +8,13 @@ import {
   Flex, 
   VStack, 
   Heading, 
-  UnorderedList,
-  ListItem,
   Text,
   Textarea } from '@chakra-ui/react'
 import { ethers } from "ethers"
 import theme from './theme'
 import Header from "./components/layout/Header"
 import Footer from "./components/layout/Footer"
-
+import Message from "./components/Messages/Message"
 import './App.css'
 
 import abi from "./utils/WavePortal.json"
@@ -42,7 +40,7 @@ export default function App() {
     useEffect(() => {
       checkIfWalletIsConnected();
       getAllWaves();
-    }, [])
+    })
 
     useEffect(() => {
       console.log('runs after every component update', waveCount)
@@ -143,47 +141,65 @@ export default function App() {
     }
   }
 
-  /*
-   * Create a method that gets all waves from your contract
-   */
   const getAllWaves = async () => {
+    const { ethereum } = window;
+  
     try {
-      const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        /*
-         * Call the getAllWaves method from your Smart Contract
-         */
         const waves = await wavePortalContract.getAllWaves();
-
-
-        /*
-         * We only need address, timestamp, and message in our UI so let's
-         * pick those out
-         */
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
+  
+        const wavesCleaned = waves.map(wave => {
+          return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message
-          });
+            message: wave.message,
+          };
         });
-
-        /*
-         * Store our data in React State
-         */
+  
         setAllWaves(wavesCleaned);
       } else {
-        console.log("Ethereum object doesn't exist!")
+        console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+  
+  /**
+   * Listen in for emitter events!
+   */
+  useEffect(() => {
+    let wavePortalContract;
+  
+    const onNewWave = (from, timestamp, message) => {
+      console.log("NewWave", from, timestamp, message);
+      setAllWaves(prevState => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message,
+        },
+      ]);
+    };
+  
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+  
+      wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+      wavePortalContract.on("NewWave", onNewWave);
+    }
+  
+    return () => {
+      if (wavePortalContract) {
+        wavePortalContract.off("NewWave", onNewWave);
+      }
+    };
+  }, []);
 
   const updateMessage = (event) => {
     let text = event.target.value
@@ -230,13 +246,8 @@ export default function App() {
           <Heading as='h3' size='lg'>Waves</Heading>
           {allWaves.map((wave, index) => {
             return (
-              <Box borderWidth='1px' borderRadius='lg' overflow='hidden' key={index} p='5' spacing='3'>
-                <UnorderedList m='0' listStyleType='none'>
-                  <ListItem>Address: {wave.address}</ListItem>
-                  <ListItem>Time: {wave.timestamp.toString()}</ListItem>
-                  <ListItem>Message: {wave.message}</ListItem>
-                </UnorderedList>
-              </Box>)
+              <Message obj={wave} key={index} /> 
+              )
           })}
         </VStack>
       </Container>
