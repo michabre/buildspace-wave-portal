@@ -6,6 +6,7 @@ import {
   Button, 
   Container, 
   Flex, 
+  HStack,
   VStack, 
   Heading, 
   Text,
@@ -18,6 +19,7 @@ import Message from "./components/Messages/Message"
 import './App.css'
 
 import abi from "./utils/WavePortal.json"
+import WaveStats from "./components/WaveStats"
 
 export default function App() {
   let provider;
@@ -181,48 +183,61 @@ export default function App() {
     <>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <Header mode={toggleColorMode} current={colorMode} account={currentAccount} connect={connectWallet} />
-      <Container maxW='container.md'>
+      <Container maxW='container.md' pt='10'>
         <Flex h='100%' align='center'>
           <Box>
             <VStack h='100%'>
-          
               <Heading as='h2'>Hey there!</Heading>
-
               <Box padding='4'>
                 <Text fontSize='lg' align='center'>
                   My name is Michael and this my first Buildspace project. Connect your Ethereum wallet and wave at me!
                 </Text>
               </Box>
-
-              <Box padding='4'>
-              <Text mb='8px'>Add a message</Text>
-              <Textarea
-                value={message}
-                onChange={updateMessage}
-                placeholder='Here is a sample placeholder'
-                size='lg'
-              />
-              </Box>
-
-              <Button onClick={wave}>
-                Wave at Me
-              </Button>
-
             </VStack>
           </Box>
         </Flex>
       </Container>
-      <Container maxW='container.md' align='center'>
-        <VStack h='100%'>
-          <Heading as='h3' size='lg'>Waves</Heading>
+
+      <Container maxW='container.md' py='10'>
+        <Flex h='100%' align='center'>
+          <Box w='100%'>
+            <HStack spacing='24px'>
+              <Box w='70%'>
+                <Textarea
+                  value={message}
+                  onChange={updateMessage}
+                  placeholder='Write a message and send a wave.'
+                  size='lg'
+                />
+              </Box>
+              <Box>
+              <Button onClick={wave}>
+                  Wave at Me
+                </Button>
+              </Box>
+            </HStack>
+          </Box>
+        </Flex>
+      </Container>
+
+      <Container maxW='container.md' py='5'>
+        <Box>
+          <Heading as='h3' size='lg'>List of Waves</Heading>
           {allWaves.map((wave, index) => {
             return (
               <Message obj={wave} key={index} /> 
               )
           })}
-        </VStack>
+        </Box>  
       </Container>
-      <Footer status={status} waves={waveCount} />
+
+      <Container maxW='container.md' py='5'>
+        <Box w='100%'>
+          <WaveStats count={waveCount} reward={20} status={status} />
+        </Box>
+      </Container>
+
+      <Footer />
     </>
   )
 }

@@ -15,7 +15,7 @@ import shortenAddress from '../../helpers/shortenAddress'
 const Header = ({ mode, current, account, connect }) => { 
   let icon = current === 'light' ? <SunIcon /> : <MoonIcon />
   return (
-      <Flex h='10vh'>
+      <Flex>
         <Box p='4'>
           <Heading as='h1' fontSize='20px'>Wave Portal</Heading>
         </Box>
