@@ -8,7 +8,9 @@ import {
   Spacer
 } from '@chakra-ui/react'
 
-import { MoonIcon, SunIcon, StarIcon} from '@chakra-ui/icons'
+import { LockIcon, MoonIcon, SunIcon, StarIcon} from '@chakra-ui/icons'
+
+import shortenAddress from '../../helpers/shortenAddress'
 
 const Header = ({ mode, current, account, connect }) => { 
   let icon = current === 'light' ? <SunIcon /> : <MoonIcon />
@@ -19,13 +21,15 @@ const Header = ({ mode, current, account, connect }) => {
         </Box>
         <Spacer />
         <Box p='4'>
-          Connected Account: {account}
-        </Box>
-        <Box p='4'>
         <ButtonGroup variant='outline' spacing='2'>
           {!account && (
             <Button leftIcon={<StarIcon />} onClick={connect}>
               Connect
+            </Button>
+          )}
+          {account && (
+            <Button leftIcon={<LockIcon />}>
+              {shortenAddress(account)}
             </Button>
           )}
             <Button leftIcon={icon} onClick={mode}>
