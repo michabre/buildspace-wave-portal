@@ -1,11 +1,15 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract WavePortal {
-    uint256 totalWaves;
+contract WavePortal is Ownable {
+    using Counters for Counters.Counter;
+
+    Counters.Counter totalWaves;
 
     /*
      * We will be using this below to help generate a random number
@@ -53,7 +57,7 @@ contract WavePortal {
          * Update the current timestamp we have for the user
          */
         lastWavedAt[msg.sender] = block.timestamp;
-        totalWaves += 1;
+        totalWaves.increment();
         console.log("%s has waved!", msg.sender);
 
         waves.push(Wave(msg.sender, _message, block.timestamp));
@@ -91,6 +95,6 @@ contract WavePortal {
     }
 
     function getTotalWaves() public view returns (uint256) {
-        return totalWaves;
+        return totalWaves.current();
     }
 }
