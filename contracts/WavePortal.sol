@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
@@ -10,12 +11,9 @@ contract WavePortal is Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter totalWaves;
+    Counters.Counter numberOfWinners;
 
-    /*
-     * We will be using this below to help generate a random number
-     */
     uint256 private seed;
-
     event NewWave(address indexed from, uint256 timestamp, string message);
 
     struct Wave {
@@ -26,18 +24,12 @@ contract WavePortal is Ownable {
 
     Wave[] waves;
 
-    /*
-     * This is an address => uint mapping, meaning I can associate an address with a number!
-     * In this case, I'll be storing the address with the last time the user waved at us.
-     */
     mapping(address => uint256) public lastWavedAt;
 
     constructor() payable {
         console.log("We have been constructed!");
-        /*
-         * Set the initial seed
-         */
         seed = (block.timestamp + block.difficulty) % 100;
+        numberOfWinners.reset();
     }
 
     function wave(string memory _message) public {
@@ -66,7 +58,6 @@ contract WavePortal is Ownable {
          * Generate a new seed for the next user that sends a wave
          */
         seed = (block.difficulty + block.timestamp + seed) % 100;
-
         console.log("Random # generated: %d", seed);
 
         /*
@@ -75,10 +66,8 @@ contract WavePortal is Ownable {
         if (seed <= 50) {
             console.log("%s won!", msg.sender);
 
-            /*
-             * The same code we had before to send the prize.
-             */
             uint256 prizeAmount = 0.0001 ether;
+            numberOfWinners.increment();
             require(
                 prizeAmount <= address(this).balance,
                 "Trying to withdraw more money than the contract has."
@@ -96,5 +85,9 @@ contract WavePortal is Ownable {
 
     function getTotalWaves() public view returns (uint256) {
         return totalWaves.current();
+    }
+
+    function getNumberOfWinners() public view returns (uint256) {
+        return numberOfWinners.current();
     }
 }
