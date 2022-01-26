@@ -4,6 +4,7 @@ import {
   useColorMode, 
   Box, 
   Button, 
+  Center,
   Container, 
   Flex, 
   HStack,
@@ -29,11 +30,12 @@ export default function App() {
   const { colorMode, toggleColorMode } = useColorMode()
   const [currentAccount, setCurrentAccount] = useState("")
   const [waveCount, setWaveCount] = useState(0)
+  const [winners, setWinners] = useState(0)
   const [status, setStatus] = useState("No active transaction")
   const [message, setMessage] = useState("")
   const [allWaves, setAllWaves] = useState([])
 
-  const contractAddress = "0xf086a2c48982c47dB3292157bb104fF0bF913f01"
+  const contractAddress = "0x2fAeAbf1d75Ba9ede445D833aAB1bdbc76E06F23"
   const contractABI = abi.abi
 
   /*
@@ -59,8 +61,10 @@ export default function App() {
         wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
         let count = await wavePortalContract.getTotalWaves();
+        let numberOfWinners = await wavePortalContract.getNumberOfWinners();
         console.log("Retrieved total wave count...", count.toNumber());
         setWaveCount(count.toNumber());
+        setWinners(numberOfWinners.toNumber());
       }
 
       /*
@@ -114,6 +118,8 @@ export default function App() {
 
         count = await wavePortalContract.getTotalWaves();
         setWaveCount(count.toNumber());
+        let numberOfWinners = await wavePortalContract.getNumberOfWinners();
+        setWinners(numberOfWinners.toNumber());
         setStatus('Completed')
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -221,20 +227,23 @@ export default function App() {
       </Container>
 
       <Container maxW='container.md' py='5'>
-        <Box>
-          <Heading as='h3' size='lg'>List of Waves</Heading>
-          {allWaves.map((wave, index) => {
-            return (
-              <Message obj={wave} key={index} /> 
-              )
-          })}
-        </Box>  
+        <Box w='100%'>
+          <WaveStats count={waveCount} winners={winners} status={status} />
+        </Box>
       </Container>
 
       <Container maxW='container.md' py='5'>
-        <Box w='100%'>
-          <WaveStats count={waveCount} reward={20} status={status} />
-        </Box>
+        <Box>
+          <Heading as='h3' size='lg' align='center'>List of Waves</Heading>
+          {allWaves.map((wave, index) => {
+            return (
+              <Center>
+<Message obj={wave} key={index} />
+              </Center>
+               
+              )
+          })}
+        </Box>  
       </Container>
 
       <Footer />

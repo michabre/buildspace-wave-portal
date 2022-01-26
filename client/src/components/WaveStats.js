@@ -4,12 +4,10 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
-  StatArrow,
-  StatGroup,
+  StatGroup
 } from '@chakra-ui/react'
 
-const WaveStats = ({ count, reward, status }) => {
+const WaveStats = ({ count, winners, status }) => {
   return (
 <StatGroup>
   <Stat>
@@ -18,8 +16,8 @@ const WaveStats = ({ count, reward, status }) => {
   </Stat>
 
   <Stat>
-    <StatLabel>Rewarded</StatLabel>
-    <StatNumber>{reward} ETH</StatNumber>
+    <StatLabel>Number of Winners</StatLabel>
+    <StatNumber>{winners}</StatNumber>
   </Stat>
 
   <Stat>
