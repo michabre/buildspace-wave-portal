@@ -193,7 +193,7 @@ export default function App() {
         <Flex h='100%' align='center'>
           <Box>
             <VStack h='100%'>
-              <Heading as='h2'>Hey there!</Heading>
+              <Heading as='h2' fontSize='5xl'>Hello</Heading>
               <Box padding='4'>
                 <Text fontSize='lg' align='center'>
                   My name is Michael and this my first Buildspace project. Connect your Ethereum wallet and wave at me!
@@ -218,7 +218,7 @@ export default function App() {
               </Box>
               <Box>
               <Button onClick={wave}>
-                  Wave at Me
+                  Send
                 </Button>
               </Box>
             </HStack>
@@ -226,22 +226,21 @@ export default function App() {
         </Flex>
       </Container>
 
-      <Container maxW='container.md' py='5'>
+      <Container maxW='container.md' py='5' borderTopWidth='1px' borderBottomWidth='1px' borderColor='gray.400'>
         <Box w='100%'>
           <WaveStats count={waveCount} winners={winners} status={status} />
         </Box>
       </Container>
 
-      <Container maxW='container.md' py='5'>
+      <Container maxW='container.md' py='10'>
         <Box>
           <Heading as='h3' size='lg' align='center'>List of Waves</Heading>
           {allWaves.map((wave, index) => {
             return (
               <Center>
-<Message obj={wave} key={index} />
-              </Center>
-               
-              )
+                <Message obj={wave} key={index} />
+              </Center>   
+            )
           })}
         </Box>  
       </Container>
