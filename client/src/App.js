@@ -17,6 +17,7 @@ import theme from './theme'
 import Header from "./components/layout/Header"
 import Footer from "./components/layout/Footer"
 import Message from "./components/Messages/Message"
+import Notification from "./components/Notification/Notification"
 import './App.css'
 
 import abi from "./utils/WavePortal.json"
@@ -34,6 +35,8 @@ export default function App() {
   const [status, setStatus] = useState("No active transaction")
   const [message, setMessage] = useState("")
   const [allWaves, setAllWaves] = useState([])
+  const [notificationMessage, setNotificationMessage] = useState("")
+  const [notificationLevel, setNotificationLevel] = useState("")
 
   const contractAddress = "0x2fAeAbf1d75Ba9ede445D833aAB1bdbc76E06F23"
   const contractABI = abi.abi
@@ -51,32 +54,26 @@ export default function App() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        console.log("Make sure you have metamask!");
         return;
-      } else {
-        console.log("We have the ethereum object", ethereum);
-        
+      } else {        
         provider = new ethers.providers.Web3Provider(ethereum);
         signer = provider.getSigner();
         wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
         let count = await wavePortalContract.getTotalWaves();
         let numberOfWinners = await wavePortalContract.getNumberOfWinners();
-        console.log("Retrieved total wave count...", count.toNumber());
         setWaveCount(count.toNumber());
         setWinners(numberOfWinners.toNumber());
       }
 
-      /*
-      * Check if we're authorized to access the user's wallet
-      */
       const accounts = await ethereum.request({ method: "eth_accounts" });
 
       if (accounts.length !== 0) {
         const account = accounts[0];
         setCurrentAccount(account)
       } else {
-        console.log("No authorized account found")
+        setNotificationMessage("No authorized account found")
+        setNotificationLevel("warning")
       }
     } catch (error) {
       console.log(error);
@@ -91,7 +88,8 @@ export default function App() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        alert("Get MetaMask!");
+        setNotificationMessage("No wallet found. Get MetaMask!")
+        setNotificationLevel("warning")
         return;
       }
 
@@ -147,6 +145,7 @@ export default function App() {
         setAllWaves(wavesCleaned);
       } else {
         console.log("Ethereum object doesn't exist!");
+
       }
     } catch (error) {
       console.log(error);
@@ -158,7 +157,6 @@ export default function App() {
    */
   useEffect(() => {  
     const onNewWave = (from, timestamp, message) => {
-      console.log("NewWave", from, timestamp, message);
       setAllWaves(prevState => [
         ...prevState,
         {
@@ -193,6 +191,7 @@ export default function App() {
         <Flex h='100%' align='center'>
           <Box>
             <VStack h='100%'>
+              {notificationMessage && <Notification level={notificationLevel} message={notificationMessage} />}
               <Heading as='h2' fontSize='5xl'>Hello</Heading>
               <Box padding='4'>
                 <Text fontSize='lg' align='center'>
