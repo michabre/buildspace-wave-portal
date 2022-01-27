@@ -117,6 +117,13 @@ export default function App() {
         count = await wavePortalContract.getTotalWaves();
         setWaveCount(count.toNumber());
         let numberOfWinners = await wavePortalContract.getNumberOfWinners();
+
+        if (waveTxn.events === true) {
+          let prizeAwarded = waveTxn.events.PrizeAwarded;
+          let values = prizeAwarded.returnValues;
+          console.log(values);
+        }
+
         setWinners(numberOfWinners.toNumber());
         setStatus('Completed')
       } else {

@@ -26,6 +26,11 @@ contract WavePortal is Ownable {
 
     mapping(address => uint256) public lastWavedAt;
 
+    /**
+     * EVENTS
+    */
+    event PrizeAwarded(address _user, uint256 _time, bytes32 _note);
+
     constructor() payable {
         console.log("We have been constructed!");
         seed = (block.timestamp + block.difficulty) % 100;
@@ -65,6 +70,8 @@ contract WavePortal is Ownable {
 
             uint256 prizeAmount = 0.0001 ether;
             numberOfWinners.increment();
+            emit PrizeAwarded(msg.sender, block.timestamp, "Huzzah!");
+            
             require(
                 prizeAmount <= address(this).balance,
                 "Trying to withdraw more money than the contract has."
