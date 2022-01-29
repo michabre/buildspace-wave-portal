@@ -38,7 +38,7 @@ export default function App() {
   const [notificationMessage, setNotificationMessage] = useState("")
   const [notificationLevel, setNotificationLevel] = useState("")
 
-  const contractAddress = "0x2fAeAbf1d75Ba9ede445D833aAB1bdbc76E06F23"
+  const contractAddress = "0x893481044652b109058AefcB17b22C4D5DF88a74"
   const contractABI = abi.abi
 
   /*
@@ -173,17 +173,24 @@ export default function App() {
         },
       ]);
     };
+
+    const onPrizeAwarded = (user, time, note) => {
+      setNotificationMessage(`${user} won the prize at ${time}. ${note}`)
+      setNotificationLevel("success")
+    }
   
     if (window.ethereum) {
-      wavePortalContract.on("NewWave", onNewWave);
+      wavePortalContract.on("NewWave", onNewWave)
+      wavePortalContract.on("PrizeAwarded", onPrizeAwarded)
     }
   
     return () => {
       if (wavePortalContract) {
-        wavePortalContract.off("NewWave", onNewWave);
+        wavePortalContract.off("NewWave", onNewWave)
+        wavePortalContract.off("PrizeAwarded", onPrizeAwarded)
       }
     };
-  }, []);
+  }, [wavePortalContract]);
 
   const updateMessage = (event) => {
     let text = event.target.value
@@ -243,8 +250,8 @@ export default function App() {
           <Heading as='h3' size='lg' align='center'>List of Waves</Heading>
           {allWaves.map((wave, index) => {
             return (
-              <Center>
-                <Message obj={wave} key={index} />
+              <Center key={index}>
+                <Message obj={wave} />
               </Center>   
             )
           })}

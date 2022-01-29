@@ -10,12 +10,19 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract WavePortal is Ownable {
     using Counters for Counters.Counter;
 
+    // Global state variables of contract
     Counters.Counter totalWaves;
     Counters.Counter numberOfWinners;
 
+    // used for generating a random number
     uint256 private seed;
-    event NewWave(address indexed from, uint256 timestamp, string message);
 
+    // checks the last time a user waved
+    mapping(address => uint256) public lastWavedAt;
+
+    // Enum Types
+
+    // Struct Types
     struct Wave {
         address waver;
         string message;
@@ -24,13 +31,13 @@ contract WavePortal is Ownable {
 
     Wave[] waves;
 
-    mapping(address => uint256) public lastWavedAt;
+    // Function modifier definitions
 
-    /**
-     * EVENTS
-    */
+    // Events definitions
+    event NewWave(address indexed from, uint256 timestamp, string message);
     event PrizeAwarded(address _user, uint256 _time, bytes32 _note);
 
+    // Functions
     constructor() payable {
         console.log("We have been constructed!");
         seed = (block.timestamp + block.difficulty) % 100;
@@ -52,8 +59,6 @@ contract WavePortal is Ownable {
          */
         lastWavedAt[msg.sender] = block.timestamp;
         totalWaves.increment();
-        console.log("%s has waved!", msg.sender);
-
         waves.push(Wave(msg.sender, _message, block.timestamp));
 
         /*
@@ -76,6 +81,7 @@ contract WavePortal is Ownable {
                 prizeAmount <= address(this).balance,
                 "Trying to withdraw more money than the contract has."
             );
+
             (bool success, ) = (msg.sender).call{value: prizeAmount}("");
             require(success, "Failed to withdraw money from contract.");
         }
