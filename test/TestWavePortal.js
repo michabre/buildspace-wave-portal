@@ -21,7 +21,7 @@ describe("WavePortal", function () {
       let waveCount = await contract.getTotalWaves();
       assert.equal(waveCount, 0);
 
-      let waveTxn = await contract.wave('Hello');
+      let waveTxn = await contract.wave('Darth Vader', 'If you find this, you are a true Sith Lord');
       await waveTxn.wait();
 
       waveCount = await contract.getTotalWaves();
@@ -29,7 +29,7 @@ describe("WavePortal", function () {
     });
 
     it("users wins and gets prize", async () => {
-      let waveTxn = await contract.wave('Hello');
+      let waveTxn = await contract.wave('Darth Vader', 'If you find this, you are a true Sith Lord');
       await waveTxn.wait();
       let winners = await contract.getNumberOfWinners();
 
@@ -45,11 +45,11 @@ describe("WavePortal", function () {
 
     it("should be 3 waves", async () => {
       const [owner, addr1, addr2] = await ethers.getSigners();
-      let waveTxn = await contract.connect(owner).wave('Have not a clue');
+      let waveTxn = await contract.connect(owner).wave('Riddler', 'Have not a clue');
       await waveTxn.wait();
-      let waveTxn2 = await contract.connect(addr1).wave('Lets play a game');
+      let waveTxn2 = await contract.connect(addr1).wave('Joker', 'Lets play a game');
       await waveTxn2.wait();
-      let waveTxn3 = await contract.connect(addr2).wave('Just me and you');
+      let waveTxn3 = await contract.connect(addr2).wave('Bane', 'Just me and you');
       await waveTxn3.wait();
       let waves = await contract.getTotalWaves();
 
@@ -58,12 +58,13 @@ describe("WavePortal", function () {
 
     it("return a wave tuple", async () => {
       const [owner] = await ethers.getSigners();
-      let waveTxn = await contract.connect(owner).wave('Hello');
+      let waveTxn = await contract.connect(owner).wave('Mr. Rogers', 'Hello');
       await waveTxn.wait();
 
       let getWave = await contract.getAllWaves();
 
       assert.equal(getWave[0].waver, owner.address);
+      assert.equal(getWave[0].username, 'Mr. Rogers');
       assert.equal(getWave[0].message, 'Hello');
 
     });

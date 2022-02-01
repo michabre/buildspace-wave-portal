@@ -24,6 +24,7 @@ contract WavePortal is Ownable {
 
     // Struct Types
     struct Wave {
+        string username;
         address waver;
         string message;
         uint256 timestamp;
@@ -35,7 +36,7 @@ contract WavePortal is Ownable {
 
     // Events definitions
     event NewWave(address indexed from, uint256 timestamp, string message);
-    event PrizeAwarded(address _user, uint256 _time, bytes32 _note);
+    event PrizeAwarded(string _username, address _user, uint256 _time, bytes32 _note);
 
     // Functions
     constructor() payable {
@@ -44,7 +45,7 @@ contract WavePortal is Ownable {
         numberOfWinners.reset();
     }
 
-    function wave(string memory _message) public {
+    function wave(string memory _username, string memory _message) public {
         // require(
         //     lastWavedAt[msg.sender] + 15 minutes < block.timestamp,
         //     "Wait 15m"
@@ -59,13 +60,14 @@ contract WavePortal is Ownable {
          */
         lastWavedAt[msg.sender] = block.timestamp;
         totalWaves.increment();
-        waves.push(Wave(msg.sender, _message, block.timestamp));
+        waves.push(Wave(_username, msg.sender, _message, block.timestamp));
 
         /*
          * Generate a new seed for the next user that sends a wave
          */
         seed = (block.difficulty + block.timestamp + seed) % 100;
         console.log("Random # generated: %d", seed);
+        console.log("Submitted by %s", _username);
 
         /*
          * Give a 50% chance that the user wins the prize.
@@ -75,7 +77,7 @@ contract WavePortal is Ownable {
 
             uint256 prizeAmount = 0.0001 ether;
             numberOfWinners.increment();
-            emit PrizeAwarded(msg.sender, block.timestamp, "Huzzah!");
+            emit PrizeAwarded(_username, msg.sender, block.timestamp, "Huzzah!");
             
             require(
                 prizeAmount <= address(this).balance,

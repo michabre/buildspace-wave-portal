@@ -112,7 +112,7 @@ export default function App() {
         let count = await wavePortalContract.getTotalWaves();
         setWaveCount(count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave(message);
+        const waveTxn = await wavePortalContract.wave(username, message);
         setStatus('Mining in Progress...')
 
         await waveTxn.wait();
@@ -147,8 +147,6 @@ export default function App() {
     const { ethereum } = window;
     try {
       if (!ethereum) {
-        setNotificationMessage("Ethereum object doesn't exist!")
-        setNotificationLevel("warning")
         return;
       } else {
         const waves = await wavePortalContract.getAllWaves();
@@ -255,9 +253,7 @@ export default function App() {
                   size='lg'
                   mb={5}
                 />
-                <Button onClick={wave}>
-                  Send
-                </Button>
+                {currentAccount && username && message && <Button onClick={wave}>Send</Button>}
               </Box>
               
             </HStack>
@@ -272,7 +268,7 @@ export default function App() {
         </Box>
       </Container>
 
-      <Container maxW='container.md' py='10'>
+      {currentAccount && <Container maxW='container.md' py='10'>
         <Box>
           <Heading as='h3' size='lg' align='center'>List of Waves</Heading>
           {allWaves.map((wave, index) => {
@@ -283,7 +279,7 @@ export default function App() {
             )
           })}
         </Box>  
-      </Container>
+      </Container>}
 
       <Footer />
     </>
