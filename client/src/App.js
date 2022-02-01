@@ -42,7 +42,7 @@ export default function App() {
   const [notificationMessage, setNotificationMessage] = useState("")
   const [notificationLevel, setNotificationLevel] = useState("")
 
-  const contractAddress = "0x893481044652b109058AefcB17b22C4D5DF88a74"
+  const contractAddress = "0xB3313C525869b88B995aC6435DC6c2874C09e3d0"
   const contractABI = abi.abi
 
   /*
@@ -152,6 +152,7 @@ export default function App() {
         const waves = await wavePortalContract.getAllWaves();
         const wavesCleaned = waves.map(wave => {
           return {
+            username: wave.username,
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
             message: wave.message,
@@ -180,11 +181,8 @@ export default function App() {
       ]);
     };
 
-    const onPrizeAwarded = (user, time, note) => {
-      let daySent = getDaySent(time);
-      let timeSent = getTimeSent(time);
-      let message = ethers.utils.parseBytes32String(note)
-      setNotificationMessage(`Winner Winner Chicken Dinner! ${user} won on ${daySent} at ${timeSent} with this message <i>${message}</i>`)
+    const onPrizeAwarded = (name, user, time, note) => {
+      setNotificationMessage(`Winner Winner Chicken Dinner! Congratulations ${name}! You won a prize!`)
       setNotificationLevel("success")
     }
   
@@ -211,7 +209,6 @@ export default function App() {
     setUsername(text)
   }
 
-  
   return (
     <>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
