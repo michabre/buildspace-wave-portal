@@ -9,10 +9,13 @@ import {
   Flex, 
   HStack,
   VStack, 
-  Heading, 
+  Heading,
+  Input, 
   Text,
   Textarea } from '@chakra-ui/react'
 import { ethers } from "ethers"
+import { getDaySent, getTimeSent } from "./helpers/timestampConverters"
+
 import theme from './theme'
 import Header from "./components/layout/Header"
 import Footer from "./components/layout/Footer"
@@ -33,6 +36,7 @@ export default function App() {
   const [waveCount, setWaveCount] = useState(0)
   const [winners, setWinners] = useState(0)
   const [status, setStatus] = useState("No active transaction")
+  const [username, setUsername] = useState("")
   const [message, setMessage] = useState("")
   const [allWaves, setAllWaves] = useState([])
   const [notificationMessage, setNotificationMessage] = useState("")
@@ -124,8 +128,13 @@ export default function App() {
           console.log(values);
         }
 
+        console.log(waveTxn);
+
         setWinners(numberOfWinners.toNumber());
         setStatus('Completed')
+        setUsername("")
+        setMessage("")
+
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -136,11 +145,13 @@ export default function App() {
 
   const getAllWaves = async () => {
     const { ethereum } = window;
-  
     try {
-      if (ethereum) {
+      if (!ethereum) {
+        setNotificationMessage("Ethereum object doesn't exist!")
+        setNotificationLevel("warning")
+        return;
+      } else {
         const waves = await wavePortalContract.getAllWaves();
-  
         const wavesCleaned = waves.map(wave => {
           return {
             address: wave.waver,
@@ -150,9 +161,6 @@ export default function App() {
         });
   
         setAllWaves(wavesCleaned);
-      } else {
-        console.log("Ethereum object doesn't exist!");
-
       }
     } catch (error) {
       console.log(error);
@@ -175,7 +183,10 @@ export default function App() {
     };
 
     const onPrizeAwarded = (user, time, note) => {
-      setNotificationMessage(`${user} won the prize at ${time}. ${note}`)
+      let daySent = getDaySent(time);
+      let timeSent = getTimeSent(time);
+      let message = ethers.utils.parseBytes32String(note)
+      setNotificationMessage(`Winner Winner Chicken Dinner! ${user} won on ${daySent} at ${timeSent} with this message <i>${message}</i>`)
       setNotificationLevel("success")
     }
   
@@ -196,6 +207,12 @@ export default function App() {
     let text = event.target.value
     setMessage(text)
   }
+
+  const updateUsername = (event) => {
+    let text = event.target.value
+    setUsername(text)
+  }
+
   
   return (
     <>
@@ -218,24 +235,34 @@ export default function App() {
       </Container>
 
       <Container maxW='container.md' py='10'>
-        <Flex h='100%' align='center'>
-          <Box w='100%'>
+        <Flex h='100%' align='center' justify='center'>
+       
+          <Box w='70%'>
             <HStack spacing='24px'>
-              <Box w='70%'>
+              
+              <Box>
+                <Input 
+                  value={username}
+                  onChange={updateUsername}
+                  placeholder='Enter your name' 
+                  size='lg' 
+                  mb={5} 
+                />
                 <Textarea
                   value={message}
                   onChange={updateMessage}
                   placeholder='Write a message and send a wave.'
                   size='lg'
+                  mb={5}
                 />
-              </Box>
-              <Box>
-              <Button onClick={wave}>
+                <Button onClick={wave}>
                   Send
                 </Button>
               </Box>
+              
             </HStack>
           </Box>
+         
         </Flex>
       </Container>
 
