@@ -42,7 +42,7 @@ export default function App() {
   const [notificationMessage, setNotificationMessage] = useState("")
   const [notificationLevel, setNotificationLevel] = useState("")
 
-  const contractAddress = "0xB3313C525869b88B995aC6435DC6c2874C09e3d0"
+  const contractAddress = "0x3bEBFb0f296519650fe7886d3f85719402bE5869"
   const contractABI = abi.abi
 
   /*
