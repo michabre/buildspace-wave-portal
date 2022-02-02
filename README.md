@@ -1,8 +1,35 @@
 # BuildSpace Project: WavePortal
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project demonstrates a basic Hardhat use case and simple interactions with a smart contract running on a TestNet. 
+
+It is based on BuildSpace's **Build a Web3 App with Solidity + Ethereum Smart Contracts** tutorial.
+
+Once a user's wallet is connected, they can submit a name and message. Once submitted, they have a chance to win some Rinkeby ETH.
+
+## Structure
+
+The root directory contains the smart contract, dependencies and tests.
+
+The client directory contains the React app users will interact with.
+
+This has been deployed here: https://waveportal-project.herokuapp.com
+
+## Getting Started
+
+> **npm install** will take care of any of the required dependencies.
+
+Rename __hardhat.config.sample.js__ to __hardhat.config.js__ and add the appropriate details to deploy to the Rinkeby TestNet. Once completed, do not commit this file. Its already been added to
+.gitignore, but make sure it does not get uploaded to a public place. Bots will steal your private key!
 
 ## Commands
+
+### Compile
+
+Compile smart contract as outlined in scripts/run.js
+
+```shell
+npm run compile
+```
 
 ### Hardhat
 
@@ -12,28 +39,36 @@ Try running some of the following tasks:
 npx hardhat accounts
 npx hardhat compile
 npx hardhat clean
-npx hardhat test
 npx hardhat node
 npx hardhat help
 ```
 
 ### Testing
 
-Solidity Coverage will display how much of the project is being
-covered by the tests.
+Run through some basic tests outlined in the test directory.
+
+Using Mocha and Chai.
+
+```shell
+npx hardhat test
+```
+
+**Solidity Coverage** will display how much of the project is being covered by the tests.
 
 ```shell
 npx hardhat coverage
 ```
 
-### Deployed to Rinkeby!
+### Deployment
+
+Deploy smart contract to the local test network
 
 ```shell
-> npx hardhat run scripts/deploy.js --network rinkeby
+npm run localhost
+```
 
-Compiling 2 files with 0.8.4
-Compilation finished successfully
-Deploying contracts with account:  0x11AAf226C28bCcfFD98296cAd4c84344bd358316
-Account balance:  201000000000000000
-WavePortal address:  0xe4A174Bc043A7E7438b0f391eb07532CA11e80F7
+Deploy smart contract to Rinkeby TestNet
+
+```shell
+npm run rinkeby
 ```
