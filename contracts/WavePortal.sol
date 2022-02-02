@@ -46,13 +46,9 @@ contract WavePortal is Ownable {
     }
 
     function wave(string memory _username, string memory _message) public {
-        // require(
-        //     lastWavedAt[msg.sender] + 15 minutes < block.timestamp,
-        //     "Wait 15m"
-        // );
         require(
-            lastWavedAt[msg.sender] + 30 seconds < block.timestamp, 
-            "Must wait 30 seconds before waving again."
+            lastWavedAt[msg.sender] + 15 minutes < block.timestamp,
+            "Wait 15m"
         );
 
         /*
@@ -70,9 +66,9 @@ contract WavePortal is Ownable {
         console.log("Submitted by %s", _username);
 
         /*
-         * Give a 50% chance that the user wins the prize.
+         * Give a 20% chance that the user wins the prize.
          */
-        if (seed <= 50) {
+        if (seed <= 20) {
             console.log("%s won!", msg.sender);
 
             uint256 prizeAmount = 0.0001 ether;
